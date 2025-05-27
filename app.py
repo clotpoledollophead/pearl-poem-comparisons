@@ -12,7 +12,6 @@ st.title("Comparisons of Poems from the Pearl Manuscript")
 # --- Data Loading ---
 try:
     df = pd.read_csv("all_poems_analysis_master.csv")
-    st.success("Successfully loaded 'all_poems_analysis_master.csv'!")
 except FileNotFoundError:
     st.error("Error: 'all_poems_analysis_master.csv' not found. Please ensure that 'articutExtract.py' has been run successfully to generate this file, and it is in the same directory as this Streamlit app.")
     st.stop()
@@ -62,43 +61,37 @@ st.markdown("*(Compare the proportion of linguistic features across selected poe
 selected_poems_for_dist_chart = st.multiselect(
     "Select Poems to Compare on Bar Chart:",
     poem_names,
-    default=list(poem_names[:min(len(poem_names), 2)]), # Default to first two poems
+    default=list(poem_names[:min(len(poem_names), 2)]),
     key='dist_select_poems_multiselect'
 )
 
 if len(selected_poems_for_dist_chart) > 0:
-    # Filter feature frequency DataFrame for selected poems
     dist_chart_data = feature_freq_df.loc[selected_poems_for_dist_chart].reset_index()
 
-    # Melt the DataFrame to long format for Plotly Express
     dist_chart_data_melted = dist_chart_data.melt(
         id_vars='Poem Name',
         var_name='Feature',
         value_name='Proportion'
     )
 
-    # Filter out features that are 0 for all selected poems to make the chart cleaner
     non_zero_features_dist = dist_chart_data_melted.groupby('Feature')['Proportion'].sum()
     features_to_keep_dist = non_zero_features_dist[non_zero_features_dist > 0].index
     dist_chart_data_melted = dist_chart_data_melted[dist_chart_data_melted['Feature'].isin(features_to_keep_dist)]
 
-    # Sort features for consistent x-axis order (e.g., by overall frequency)
     feature_order_dist = feature_freq_df.sum().sort_values(ascending=False).index.tolist()
     dist_chart_data_melted['Feature'] = pd.Categorical(dist_chart_data_melted['Feature'], categories=feature_order_dist, ordered=True)
     dist_chart_data_melted = dist_chart_data_melted.sort_values('Feature')
-
 
     fig = px.bar(
         dist_chart_data_melted,
         x='Feature',
         y='Proportion',
-        color='Poem Name', # Differentiate bars by poem
-        barmode='group', # Group bars for comparison
+        color='Poem Name',
+        barmode='group',
         title=f'{analysis_type} Distribution Comparison',
         labels={'Proportion': 'Proportion of Words', 'Feature': analysis_type},
         height=500
     )
-    # Improve layout for better readability if many features
     fig.update_xaxes(tickangle=45)
     st.plotly_chart(fig, use_container_width=True)
 else:
@@ -116,16 +109,25 @@ selected_poems_for_radar = st.multiselect(
     key='radar_select_poems'
 )
 
-if len(selected_poems_for_radar) > 0:
-    radar_data = feature_freq_df.loc[selected_poems_for_radar].reset_index()
+# Get all available features based on the chosen analysis type
+all_available_features = feature_freq_df.columns.tolist()
+
+# Allow user to select specific features for the radar chart
+selected_features_for_radar = st.multiselect(
+    f"Select specific {analysis_type} features for the Radar Chart axes:",
+    all_available_features,
+    default=all_available_features[:min(len(all_available_features), 5)], # Default to top 5
+    key='radar_select_features'
+)
+
+
+if len(selected_poems_for_radar) > 0 and len(selected_features_for_radar) > 0:
+    # Filter radar_data based on selected poems and selected features
+    radar_data = feature_freq_df.loc[selected_poems_for_radar, selected_features_for_radar].reset_index()
     radar_data_melted = radar_data.melt(id_vars='Poem Name', var_name='Feature', value_name='Proportion')
 
-    non_zero_features = radar_data_melted.groupby('Feature')['Proportion'].sum()
-    features_to_keep = non_zero_features[non_zero_features > 0].index
-    radar_data_melted = radar_data_melted[radar_data_melted['Feature'].isin(features_to_keep)]
-
-    feature_order = feature_freq_df.sum().sort_values(ascending=False).index.tolist()
-    radar_data_melted['Feature'] = pd.Categorical(radar_data_melted['Feature'], categories=feature_order, ordered=True)
+    # Ensure features are in the order selected by the user for the axes
+    radar_data_melted['Feature'] = pd.Categorical(radar_data_melted['Feature'], categories=selected_features_for_radar, ordered=True)
     radar_data_melted = radar_data_melted.sort_values('Feature')
 
     fig_radar = px.line_polar(radar_data_melted,
@@ -137,13 +139,15 @@ if len(selected_poems_for_radar) > 0:
                               height=600,
                               range_r=[0, radar_data_melted['Proportion'].max() * 1.1])
     st.plotly_chart(fig_radar, use_container_width=True)
-else:
+elif len(selected_poems_for_radar) == 0:
     st.info("Please select at least one poem to display the Radar Chart.")
+else: # No features selected
+    st.info("Please select at least one feature to display on the Radar Chart axes.")
 
 st.markdown("""
 ### How Visualizations Work:
 * **Bar Charts**: Show the proportion of each Word Type or POS Tag for **multiple selected poems**, allowing for direct comparison of their linguistic composition.
-* **Radar Chart**: Compares the linguistic profiles of selected poems. Each axis represents a linguistic feature (Word Type or POS Tag), and the lines show the proportion of that feature for each poem, forming a unique "shape" for each poem's profile. This allows for a visual comparison of how different poems utilize various linguistic elements.
+* **Radar Chart**: Compares the linguistic profiles of selected poems. Each axis represents a linguistic feature (Word Type or POS Tag), and the lines show the proportion of that feature for each poem, forming a unique "shape" for each poem's profile. This allows for a visual comparison of how different poems utilize various linguistic elements. You can select specific features to plot on the radar chart axes.
 """)
 
 st.markdown("---")
