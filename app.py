@@ -3,6 +3,7 @@ import io
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import pytz
 import streamlit as st
 
 # --- Streamlit App Configuration ---
@@ -60,7 +61,9 @@ analysis_type = st.sidebar.radio(
 )
 
 # Dynamic greeting based on time of day
-current_hour = datetime.datetime.now().hour
+your_timezone = pytz.timezone('Asia/Taipei')
+local_time = datetime.datetime.now(your_timezone)
+current_hour = local_time.hour
 if 5 <= current_hour < 12:
     greeting = "Good morning!"
 elif 12 <= current_hour < 18:
