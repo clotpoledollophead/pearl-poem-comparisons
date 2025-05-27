@@ -11,8 +11,9 @@ st.title("Comparisons of Poems from the Pearl Manuscript")
 
 st.markdown("""
 ### How Visualizations Work:
-* **Bar Charts**: Show the proportion of each Word Type or POS Tag for **multiple selected poems**, allowing for direct comparison of their linguistic composition.
-* **Radar Chart**: Compares the linguistic profiles of selected poems. Each axis represents a linguistic feature (Word Type or POS Tag), and the lines show the proportion of that feature for each poem, forming a unique "shape" for each poem's profile. This allows for a visual comparison of how different poems utilize various linguistic elements. You can select specific features to plot on the radar chart axes.
+* **Bar Chart**: Shows the proportion of each Word Type or POS Tag for direct comparisons of their linguistic composition.
+* **Radar Chart**: Compares the linguistic profiles of selected poems by either Word Type or POS Tag
+* **Word Lookup Searcher**: Allows you to search for any word across all poems and see its classified 'Word Type' and 'POS Tag'
 """)
 
 # --- Data Loading ---
@@ -149,6 +150,57 @@ elif len(selected_poems_for_radar) == 0:
     st.info("Please select at least one poem to display the Radar Chart.")
 else: # No features selected
     st.info("Please select at least one feature to display on the Radar Chart axes.")
+
+# --- Section 3: Word Lookup Searcher ---
+st.header("Word Lookup Searcher")
+st.markdown("*(Search for a specific word to see its Word Type and POS Tag across poems. Search is case-sensitive for 'ENTITY_nouny', 'LOCATION', and 'ENTITY_oov' tags.)*")
+
+search_word = st.text_input("Enter a word to search:", key="word_search_input").strip()
+
+# Optional: Allow filtering by poem name for the lookup
+selected_poems_for_lookup = st.multiselect(
+    "Filter by Poem Name (optional):",
+    poem_names,
+    default=[], # No default selection
+    key='lookup_poem_filter'
+)
+
+if search_word:
+    # Start with the full DataFrame, then filter by poem if needed
+    df_to_search = df.copy()
+    if selected_poems_for_lookup:
+        df_to_search = df_to_search[df_to_search['Poem Name'].isin(selected_poems_for_lookup)]
+
+    # Define POS tags that require case-sensitive search
+    case_sensitive_pos_tags = ['ENTITY_nouny', 'LOCATION', 'ENTITY_oov']
+
+    # Create masks for conditional filtering
+    # Mask for words with case-sensitive POS tags
+    is_case_sensitive_pos = df_to_search['POS_Tag'].isin(case_sensitive_pos_tags)
+
+    # Mask for exact case-sensitive word match
+    match_case_sensitive = (df_to_search['Word'] == search_word)
+
+    # Mask for case-insensitive word match
+    match_case_insensitive = (df_to_search['Word'].str.lower() == search_word.lower())
+
+    # Combine the masks:
+    # 1. (If POS is case-sensitive AND word matches case-sensitively) OR
+    # 2. (If POS is NOT case-sensitive AND word matches case-insensitively)
+    final_search_mask = \
+        (is_case_sensitive_pos & match_case_sensitive) | \
+        (~is_case_sensitive_pos & match_case_insensitive)
+
+    search_results = df_to_search[final_search_mask]
+
+    if not search_results.empty:
+        st.subheader(f"Occurrences of '{search_word}'")
+        display_cols = ['Poem Name', 'Word', 'Word Type', 'POS_Tag']
+        st.dataframe(search_results[display_cols].reset_index(drop=True))
+    else:
+        st.info(f"No occurrences of '{search_word}' found in the selected poems with the specified case sensitivity rules.")
+else:
+    st.info("Enter a word in the search box above to find its linguistic tags.")
 
 st.markdown("---")
 st.header("References")
