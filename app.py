@@ -1,8 +1,9 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-import plotly.express as px
+import datetime
 import io
+import numpy as np
+import pandas as pd
+import plotly.express as px
+import streamlit as st
 
 # --- Streamlit App Configuration ---
 st.set_page_config(layout="wide", page_title="Poem Linguistic Analysis", page_icon="📜")
@@ -58,12 +59,35 @@ analysis_type = st.sidebar.radio(
     ("Word Type", "POS Tag")
 )
 
+# Dynamic greeting based on time of day
+current_hour = datetime.datetime.now().hour
+if 5 <= current_hour < 12:
+    greeting = "Good morning!"
+elif 12 <= current_hour < 18:
+    greeting = "Good afternoon!"
+else:
+    greeting = "Good evening!"
+
+
+st.sidebar.header("About This App")
+st.sidebar.info(
+    greeting + " " +
+    "This interactive tool helps you explore and compare the linguistic characteristics "
+    "of poems from the Pearl Manuscript. Analyze word usage, part-of-speech tags, "
+    "and search for specific words to deepen your understanding."
+)
+
+
+st.sidebar.markdown("---") # Separator
+
+st.sidebar.caption("App created by Cindy Lee")
+
 # Get feature frequencies based on selected analysis type
 feature_freq_df = get_feature_frequencies(df, analysis_type)
 
 # --- Section 1: Linguistic Distributions by Poem ---
 st.header(f"Linguistic Distributions by Poem ({analysis_type})")
-st.markdown("*(Compare the proportion of linguistic features across selected poems)*")
+st.markdown("*Compare the proportion of linguistic features across selected poems*")
 
 selected_poems_for_dist_chart = st.multiselect(
     "Select Poems to Compare on Bar Chart:",
@@ -107,7 +131,7 @@ else:
 
 # --- Section 2: Radar Chart Comparison ---
 st.header(f"Radar Chart Comparison of Poems ({analysis_type})")
-st.markdown("*(Compare the linguistic profiles of selected poems on key features)*")
+st.markdown("*Compare the linguistic profiles of selected poems on key features*")
 
 selected_poems_for_radar = st.multiselect(
     "Select 2-4 Poems to Compare on Radar Chart:",
@@ -153,7 +177,7 @@ else: # No features selected
 
 # --- Section 3: Word Lookup Searcher ---
 st.header("Word Lookup Searcher")
-st.markdown("*Search for a specific word to see its Word Type and POS Tag across poems.*")
+st.markdown("*Search for a specific word to see its Word Type and POS Tag across poems*")
 
 search_word = st.text_input("Enter a word to search:", key="word_search_input").strip()
 
