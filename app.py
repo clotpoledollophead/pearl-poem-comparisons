@@ -145,3 +145,13 @@ st.markdown("""
 * **Bar Charts**: Show the proportion of each Word Type or POS Tag for **multiple selected poems**, allowing for direct comparison of their linguistic composition.
 * **Radar Chart**: Compares the linguistic profiles of selected poems. Each axis represents a linguistic feature (Word Type or POS Tag), and the lines show the proportion of that feature for each poem, forming a unique "shape" for each poem's profile. This allows for a visual comparison of how different poems utilize various linguistic elements.
 """)
+
+st.markdown("---")
+st.header("References")
+st.markdown("""
+This application utilizes **Articut: Chinese Word Segmentation and POS Tagging System** for linguistic analysis.
+
+**Citation for Articut:**
+
+Wang, W., Chen, C., Lee, C., Lai, C., & Lin, H. (2019). *Articut: Chinese Word Segmentation and POS Tagging System* [Computer program]. Version 101. [https://nlu.droidtown.co/](https://nlu.droidtown.co/)
+""")
