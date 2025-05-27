@@ -153,7 +153,7 @@ else: # No features selected
 
 # --- Section 3: Word Lookup Searcher ---
 st.header("Word Lookup Searcher")
-st.markdown("*(Search for a specific word to see its Word Type and POS Tag across poems. Search is case-sensitive for 'ENTITY_nouny', 'LOCATION', and 'ENTITY_oov' tags.)*")
+st.markdown("*Search for a specific word to see its Word Type and POS Tag across poems.*")
 
 search_word = st.text_input("Enter a word to search:", key="word_search_input").strip()
 
