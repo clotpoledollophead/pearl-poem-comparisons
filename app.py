@@ -9,6 +9,12 @@ st.set_page_config(layout="wide", page_title="Poem Linguistic Analysis", page_ic
 
 st.title("Comparisons of Poems from the Pearl Manuscript")
 
+st.markdown("""
+### How Visualizations Work:
+* **Bar Charts**: Show the proportion of each Word Type or POS Tag for **multiple selected poems**, allowing for direct comparison of their linguistic composition.
+* **Radar Chart**: Compares the linguistic profiles of selected poems. Each axis represents a linguistic feature (Word Type or POS Tag), and the lines show the proportion of that feature for each poem, forming a unique "shape" for each poem's profile. This allows for a visual comparison of how different poems utilize various linguistic elements. You can select specific features to plot on the radar chart axes.
+""")
+
 # --- Data Loading ---
 try:
     df = pd.read_csv("all_poems_analysis_master.csv")
@@ -143,12 +149,6 @@ elif len(selected_poems_for_radar) == 0:
     st.info("Please select at least one poem to display the Radar Chart.")
 else: # No features selected
     st.info("Please select at least one feature to display on the Radar Chart axes.")
-
-st.markdown("""
-### How Visualizations Work:
-* **Bar Charts**: Show the proportion of each Word Type or POS Tag for **multiple selected poems**, allowing for direct comparison of their linguistic composition.
-* **Radar Chart**: Compares the linguistic profiles of selected poems. Each axis represents a linguistic feature (Word Type or POS Tag), and the lines show the proportion of that feature for each poem, forming a unique "shape" for each poem's profile. This allows for a visual comparison of how different poems utilize various linguistic elements. You can select specific features to plot on the radar chart axes.
-""")
 
 st.markdown("---")
 st.header("References")
