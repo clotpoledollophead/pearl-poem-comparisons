@@ -5,9 +5,9 @@ import plotly.express as px
 import io
 
 # --- Streamlit App Configuration ---
-st.set_page_config(layout="wide", page_title="Poem Linguistic Analysis")
+st.set_page_config(layout="wide", page_title="Poem Linguistic Analysis", page_icon="📜")
 
-st.title("Poem Linguistic Analysis")
+st.title("Comparisons of Poems from the Pearl Manuscript")
 
 # --- Data Loading ---
 try:
