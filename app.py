@@ -151,7 +151,7 @@ st.header("References")
 st.markdown("""
 This application utilizes **Articut: Chinese Word Segmentation and POS Tagging System** for linguistic analysis.
 
-**Citation for Articut:**
+**References**
 
 Wang, W., Chen, C., Lee, C., Lai, C., & Lin, H. (2019). *Articut: Chinese Word Segmentation and POS Tagging System* [Computer program]. Version 101. [https://nlu.droidtown.co/](https://nlu.droidtown.co/)
 """)
